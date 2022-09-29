@@ -41,11 +41,13 @@ def BFS(inicial, obj):
     return [[], iter]
 
 def DFS(inicial, obj, lim):
-    X = Node(inicial, -1, -1)
+    depth = 0
+    X = Node(inicial, -1, depth)
     Abertos = [X]
     Fechados = []
     iter = 0
     while Abertos != []:
+        depth += 1
         iter += 1
         X = Abertos[0]
         del Abertos[0]
@@ -55,7 +57,7 @@ def DFS(inicial, obj, lim):
             Aux = geraFilhos(X.graph)
             FilhosX = []
             for i in range(np.shape(Aux)[0]):
-                FilhosX = [*FilhosX, Node(Aux[i], X, -1)]
+                FilhosX = [*FilhosX, Node(Aux[i], X, depth)]
             Fechados.append(X)
             for i in range(len(FilhosX)):
                 if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):
@@ -105,5 +107,6 @@ BFSres = BFS(Ini, Obj)
 print('\nBFS:', BFSres[1], 'iteracoes\n\n',BFSres[0].graph, '\n\nCAMINHO (OBJETIVO -> INICIAL):\n')
 BFSres[0].printPath(Ini)
 
-# DFSres = DFS(Ini, Obj)
-# print('\nDFS:\n',DFSres, '\n')
+DFSres = DFS(Ini, Obj, 5)
+print('\nBFS:', DFSres[1], 'iteracoes\n\n',DFSres[0].graph, '\n\nCAMINHO (OBJETIVO -> INICIAL):\n')
+DFSres[0].printPath(Ini)
