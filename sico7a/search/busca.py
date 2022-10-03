@@ -40,7 +40,7 @@ def BFS(inicial, obj):
                     Abertos = [*Abertos, FilhosX[i]]
     return [[], iter]
 
-def DFS(inicial, obj, lim):
+def DFS(inicial, obj, lim): #p. 106
     depth = 0
     X = Node(inicial, -1, depth)
     Abertos = [X]
