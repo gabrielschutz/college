@@ -1,22 +1,31 @@
 import numpy as np
 
 class Node:
-    def __init__(self, paramGraph, paramPai, paramDepth) -> None:
+    def __init__(self, paramGraph, paramPai, paramDepth, paramPath=[]) -> None:
         self.graph = paramGraph
         self.pai = paramPai
         self.depth = paramDepth
-    def printPath(self, Ini):
+        self.path = paramPath
+    def findPath(self):
         Aux = self
         while 1:
-            print(Aux.graph, '\n')
+            self.path = [*self.path, Aux.graph]
             if (Aux.graph == Ini).all():
                 break
             Aux = Aux.pai
+    def printPath(self):
+        for i in range(np.shape(self.path)[0]):
+            print(self.path[i], '\n')
     def checkExiste(self, Nodes):
         for j in range(np.shape(Nodes)[0]):
             if (Nodes[j].graph == self.graph).all():
                 return 1
         return 0
+    def findX(self):
+        for i in range( np.shape(self.graph)[0] ):
+            for j in range( np.shape(self.graph)[1] ):
+                if( self.graph[i][j] == 'X' ):
+                    return [i, j]
 
 def BFS(inicial, obj):
     X = Node(inicial, -1, -1)
@@ -47,21 +56,21 @@ def DFS(inicial, obj, lim): #p. 106
     Fechados = []
     iter = 0
     while Abertos != []:
-        depth += 1
-        iter += 1
         X = Abertos[0]
         del Abertos[0]
         if (X.graph == obj).all():
             return [X, iter]
-        else:
+        elif X.depth <= lim:
+            iter += 1
             Aux = geraFilhos(X.graph)
             FilhosX = []
+            depth = X.depth + 1
             for i in range(np.shape(Aux)[0]):
                 FilhosX = [*FilhosX, Node(Aux[i], X, depth)]
             Fechados.append(X)
             for i in range(len(FilhosX)):
                 if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):
-                    Abertos = [*Abertos, FilhosX[i]]
+                    Abertos = [FilhosX[i], *Abertos]
     return [[], iter]
 
 def geraFilhos(graph):
@@ -105,8 +114,8 @@ Ini = np.array([[2,  8 , 3],
 
 BFSres = BFS(Ini, Obj)
 print('\nBFS:', BFSres[1], 'iteracoes\n\n',BFSres[0].graph, '\n\nCAMINHO (OBJETIVO -> INICIAL):\n')
-BFSres[0].printPath(Ini)
+BFSres[0].printPath()
 
 DFSres = DFS(Ini, Obj, 5)
-print('\nBFS:', DFSres[1], 'iteracoes\n\n',DFSres[0].graph, '\n\nCAMINHO (OBJETIVO -> INICIAL):\n')
-DFSres[0].printPath(Ini)
+print('\nDFS:', DFSres[1], 'iteracoes\n\n',DFSres[0].graph, '\n\nCAMINHO (OBJETIVO -> INICIAL):\n')
+DFSres[0].printPath()
