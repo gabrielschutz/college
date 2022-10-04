@@ -1,20 +1,99 @@
 import numpy as np
 
 class Node:
-    def __init__(self, paramGraph, paramPai, paramDepth=-1, paramHeur=-1, paramPath=[]) -> None:
+    """
+    Class for a node from the tree created from search algorithms
+
+    Attributes
+    ---------
+
+    graph : object matrix
+        the main object of the node which holds the current position of the
+        objects in the puzzle
+    pai : Node
+        the parent node of the current node
+    depth : int
+        depth of the node only used for limited Depth-First Search
+    heur : int
+        heuristic of the node for the Best Match Search algorith
+    path : Node array
+        array the holds the path from the current node to the root
+        in order = [current node, it's parent, it's parent's parent,..., root]
+
+    Methods
+    -------
+
+    setPath()
+        sets the path from the node to the root
+    setHeur(obj)
+        sets the heuristic value of the node based on the objective
+    printPath()
+        prints the path from the root to the node
+    checkExiste(Nodes)
+        checks if the node is present in an array of nodes
+    getIndex(Nodes)
+        gets the position of the node in an array of nodes
+    findX()
+        finds the position of the movable object from the main object
+        of the node
+    """
+
+    def __init__(self, paramGraph, paramPai=-1, paramDepth=-1, paramHeur=-1, paramPath=[]) -> None:
+        """
+        Parameters
+        ----------
+
+        graph : object matrix
+            the main object of the node which holds the current position of the
+            objects in the puzzle
+        pai : Node
+            the parent node of the current node (default is -1 for the root [no parent])
+        depth : int
+            depth of the node only used for limited Depth-First Search
+            (default is -1 since only one algorithm uses it)
+        heur : int
+            heuristic of the node for the Best Match Search algorith
+            (default is -1 since only one algorithm uses it)
+        path : Node array
+            array the holds the path from the current node to the root
+            in order = [current node, it's parent, it's parent's parent,..., root]
+            (default is an empty array)
+        """
+
         self.graph = paramGraph
         self.pai = paramPai
         self.depth = paramDepth
         self.heur = paramHeur
         self.path = paramPath
+
     def setPath(self):
+        """
+        Sets the path from the node in it's path attribute. Starts at the
+        desired node, adds it to the path's array, then moves to the node's
+        parent, adding each parent until it reaches the root where the parent
+        is -1
+        """
+
         Aux = self
         while 1:
             self.path = [*self.path, Aux.graph]
-            if (Aux.graph == Ini).all():
+            if Aux.pai == -1:
                 break
             Aux = Aux.pai
+
     def setHeur(self, obj):
+        """
+        Sets the heuristic of the current by comparing the node with the objective.
+        The lower the better. Starts at row*columns and subtracts 1 for each object
+        in the correct position except for the movable object
+
+        Parameters
+        ----------
+
+        obj : object matrix
+            objective matrix for the puzzle
+        """
+
         lin = np.shape(self.graph)[0]
         col = np.shape(self.graph)[1]
         self.heur = lin*col
@@ -22,27 +101,83 @@ class Node:
             for j in range(col):
                 if(self.graph[i][j] != 'X') and (self.graph[i][j] == obj[i][j]):
                     self.heur -= 1
+
     def printPath(self):
+        """
+        Prints the path by looping backwards the node's path array and printing
+        each node's main object
+        """
+
         for i in range(len(self.path)-1, -1, -1):
             print(self.path[i], '\n')
+
     def checkExiste(self, Nodes):
+        """
+        Checks if the current node is present in a node array
+
+        Parameters
+        ----------
+
+        Nodes : Node array
+            array of nodes to check if the current node is present within
+
+        Returns
+        -------
+
+        1 
+            if the node is present
+        0
+            if the node is not present
+        """
+
         for j in range(len(Nodes)):
             if (Nodes[j].graph == self.graph).all():
                 return 1
         return 0
+
     def getIndex(self, Nodes):
+        """
+        Gets the index of the current node in a node array
+
+        Parameters
+        ----------
+
+        Nodes : Node array
+            array of nodes to get the index of the current node from
+
+        Returns
+        -------
+
+        j
+            which is the position index of the current node
+            inside the array
+        -1
+            if the node could not be found in the array
+        """
+        
         for j in range(len(Nodes)):
             if (Nodes[j].graph == self.graph).all():
                 return j
         return -1
+
     def findX(self):
+        """
+        Finds the position index of the movable object inside the current
+        node's main object
+
+        Returns
+        -------
+
+        two position int array with the row and column of the movable object
+        """
+
         for i in range(np.shape(self.graph)[0]):
             for j in range(np.shape(self.graph)[1]):
                 if(self.graph[i][j] == 'X'):
                     return [i, j]
 
 def BFS(inicial, obj):
-    X = Node(inicial, -1)
+    X = Node(inicial)
     Abertos = [X]
     Fechados = []
     iter = 0
@@ -66,7 +201,7 @@ def BFS(inicial, obj):
 
 def DFS(inicial, obj, lim):
     depth = 0
-    X = Node(inicial, -1, depth)
+    X = Node(inicial, paramDepth=depth)
     Abertos = [X]
     Fechados = []
     iter = 0
@@ -90,7 +225,7 @@ def DFS(inicial, obj, lim):
     return [[], iter]
 
 def BME(inicial, obj):
-    X = Node(inicial, -1)
+    X = Node(inicial)
     Abertos = [X]
     Fechados = []
     iter = 0
