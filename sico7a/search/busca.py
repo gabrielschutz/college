@@ -122,8 +122,6 @@ def BME(inicial, obj):
         Fechados = [*Fechados, X]
     return [[], iter]
 
-
-
 def geraFilhos(graph):
     for i in range(np.shape(graph)[0]):
         for j in range(np.shape(graph)[1]):
