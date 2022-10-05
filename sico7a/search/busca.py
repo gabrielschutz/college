@@ -73,7 +73,7 @@ class Node:
             (default is an empty array)
         """
 
-        self.graph = graph
+        self.graph = graph  # Constructor behavior...
         self.pai = pai
         self.depth = depth
         self.heur = heur
@@ -87,12 +87,12 @@ class Node:
         is -1
         """
 
-        Aux = self
-        while 1:
-            self.path = [*self.path, Aux.graph]
-            if Aux.pai == -1:
-                break
-            Aux = Aux.pai
+        Aux = self                              # Stores the current node in an auxiliary node
+        while 1:                                # Loops infinitely
+            self.path = [*self.path, Aux.graph] # Adds the auxiliary's main matrix to the node's path array
+            if Aux.pai == -1:                   # If the auxiliary node is the root (without parent)...
+                break                           # Stops the loop
+            Aux = Aux.pai                       # If it isn't, changes the auxiliary node to it's parent
 
     def setHeur(self, obj):
         """
@@ -107,13 +107,13 @@ class Node:
             objective matrix for the puzzle
         """
 
-        lin = np.shape(self.graph)[0]
-        col = np.shape(self.graph)[1]
-        self.heur = lin*col
-        for i in range(lin):
-            for j in range(col):
-                if(self.graph[i][j] != 'X') and (self.graph[i][j] == obj[i][j]):
-                    self.heur -= 1
+        lin = np.shape(self.graph)[0]                                           # Gets the number of rows...
+        col = np.shape(self.graph)[1]                                           # And columns of the node's main graph
+        self.heur = lin*col                                                     # Multiply the rows and columns and starts the node's heuristic value with it
+        for i in range(lin):                                                    # Loops the node's rows...
+            for j in range(col):                                                # And columns
+                if(self.graph[i][j] != 'X') and (self.graph[i][j] == obj[i][j]):# If a not-'X' object is in the correct position...
+                    self.heur -= 1                                              # Decrements the node's heuristic value by 1
 
     def printPath(self):
         """
@@ -121,12 +121,14 @@ class Node:
         each node's main object
         """
 
-        for i in range(len(self.path)-1, -1, -1):
-            print(self.path[i], '\n')
+        for i in range(len(self.path)-1, -1, -1):   # Loops the node's path backwards...
+            print(self.path[i], '\n')               # Printing it's main matrix, and jumping a line to visual clearance
 
     def checkExiste(self, Nodes):
         """
-        Checks if the current node is present in a node array
+        Checks if the current node is present in a node array.
+        The getIndex() method could be used to do this job, but it was decided that
+        using a "true or false" method would be simpler for some specific needs
 
         Parameters
         ----------
@@ -144,10 +146,10 @@ class Node:
             if the node is not present
         """
 
-        for j in range(len(Nodes)):
-            if (Nodes[j].graph == self.graph).all():
-                return 1
-        return 0
+        for j in range(len(Nodes)):                     # Loops the array
+            if (Nodes[j].graph == self.graph).all():    # If the main matrix of the array is the same as the node's...
+                return 1                                # Returns 1 (true)
+        return 0                                        # If it couldn't be found, returns 0 (false)
 
     def getIndex(self, Nodes):
         """
@@ -169,10 +171,10 @@ class Node:
             if the node could not be found in the array
         """
         
-        for j in range(len(Nodes)):
-            if (Nodes[j].graph == self.graph).all():
-                return j
-        return -1
+        for j in range(len(Nodes)):                     # Loops the array
+            if (Nodes[j].graph == self.graph).all():    # If the main matrix of the array is the same as the node's...
+                return j                                # Returns the position index
+        return -1                                       # If it couldn't be found, returns -1
 
     def findX(self):
         """
@@ -186,10 +188,11 @@ class Node:
             two position int array with the row (i) and column (j) of the movable object
         """
 
-        for i in range(np.shape(self.graph)[0]):
-            for j in range(np.shape(self.graph)[1]):
-                if(self.graph[i][j] == 'X'):
-                    return [i, j]
+        for i in range(np.shape(self.graph)[0]):        # Loops all the node's main matrix' rows...
+            for j in range(np.shape(self.graph)[1]):    # And columns
+                if(self.graph[i][j] == 'X'):            # If the current position object is the 'X'...
+                    return [i, j]                       # Returns it's position index
+        return -1                                       # It shouldn't, but if it couldn't find the 'X', returns -1
 
 def BFS(inicial, obj):
     """
