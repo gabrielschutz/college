@@ -390,7 +390,7 @@ def geraFilhos(Node):
         Aux[k] = Node.graph                                         # Stores the current node's matrix in the auxiliary array
         Aux[k][posX[0]][posX[1]-1] = Node.graph[posX[0]][posX[1]]   # Moves the 'X' to the left
         Aux[k][posX[0]][posX[1]] = Node.graph[posX[0]][posX[1]-1]   # Moves the number that was on the left, to the right
-        k += 1                                                      # increments the number of children
+        k += 1                                                      # Increments the number of children
     if(posX[0]-1 >= 0):                                             # Same to up...
         Aux[k] = Node.graph
         Aux[k][posX[0]-1][posX[1]] = Node.graph[posX[0]][posX[1]]
