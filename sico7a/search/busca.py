@@ -326,7 +326,8 @@ def BMS(inicial, obj):
 
     X = Node(inicial)                                                   # Creates a node based on the initial matrix called X
     Abertos = [X]                                                       # Creates an array (Open) with all the visited, but not finished, nodes with X in it
-    Fechados = []                                                       # Creates an empty array (Closed) to store all finished nodes (nodes that already had all it's children checked)
+    Fechados = []                                                       # Creates an empty array (Closed) to store all finished nodes (nodes that already had all
+                                                                        # it's children checked)
     iter = 0                                                            # Initiates the iteration counter
     while Abertos != []:                                                # Keeps checking the nodes until there's no unfinished node left
         iter += 1                                                       # Increments the iteration counter
@@ -341,7 +342,8 @@ def BMS(inicial, obj):
             for i in range(len(Aux)):                                   # Loops the auxiliary array
                 FilhosX = [*FilhosX, Node(Aux[i], X)]                   # Generate new nodes with the auxiliary array's matrix as the main matrix, and X as parent
             for i in range(len(FilhosX)):                               # Loops the Children array
-                if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):  # If the current children is not in neither in Open nor Closed arrays...
+                if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):  # If the current children is not in neither in Open nor Closed 
+                                                                                                    # arrays...
                     FilhosX[i].setHeur(obj)                             # Sets that child's heuristic...
                     Abertos = insertionSort(Abertos, FilhosX[i])        # And inserts it in the Open array, ordering it crescently by heuristic value
                 elif FilhosX[i].checkExiste(Abertos):                   # If it's in the Open array...
