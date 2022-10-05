@@ -406,7 +406,7 @@ def geraFilhos(Node):
         Aux[k][posX[0]+1][posX[1]] = Node.graph[posX[0]][posX[1]]
         Aux[k][posX[0]][posX[1]] = Node.graph[posX[0]+1][posX[1]]
         k += 1
-    return Aux[0:k]
+    return Aux[0:k]                                                 # Returns an array of the size of the number of children generated containing said children
 
 def insertionSort(A, ins):
     """
