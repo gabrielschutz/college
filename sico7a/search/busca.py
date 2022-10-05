@@ -221,27 +221,29 @@ def BFS(inicial, obj):
         the fail
     """
 
-    X = Node(inicial)
-    Abertos = [X]
-    Fechados = []
-    iter = 0
-    while Abertos != []:
-        iter += 1
-        X = Abertos[0]
-        del Abertos[0]
-        if (X.graph == obj).all():
-            X.setPath()
-            return [X, iter]
-        else:
-            Aux = geraFilhos(X)
-            FilhosX = []
-            for i in range(len(Aux)):
-                FilhosX = [*FilhosX, Node(Aux[i], X)]
-            Fechados.append(X)
-            for i in range(len(FilhosX)):
+    X = Node(inicial)                                   # Creates a node based on the initial matrix called X
+    Abertos = [X]                                       # Creates an array (Open) with all the visited, but not finished, nodes with X in it
+    Fechados = []                                       # Creates an empty array (Closed) to store all finished nodes (nodes that already had all it's children
+                                                        # checked)
+    iter = 0                                            # Initiates the iteration counter
+    while Abertos != []:                                # Keeps checking the nodes until there's no unfinished node left
+        iter += 1                                       # Increments the iteration counter by 1
+        X = Abertos[0]                                  # X receives the first unfinished node
+        del Abertos[0]                                  # Removes the first node from the Open array
+        if (X.graph == obj).all():                      # If the main matrix of X is the objective...
+            X.setPath()                                 # Sets the node's path...
+            return [X, iter]                            # ...and returns it
+        else:                                           # If it's not the objective...
+            Aux = geraFilhos(X)                         # Generates it's children and stores it in an auxiliary array
+            FilhosX = []                                # Initiates the Children array as empty
+            for i in range(len(Aux)):                   # Loops the auxiliary array
+                FilhosX = [*FilhosX, Node(Aux[i], X)]   # Generate new nodes with the auxiliary array's matrix as the main matrix, and X as parent
+            Fechados.append(X)                          # Adds X to the end of the Closed array
+            for i in range(len(FilhosX)):               # Loops the Children array backwards
                 if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):
-                    Abertos = [*Abertos, FilhosX[i]]
-    return [[], iter]
+                                                        # If the current child is in neither Open nor Closed...
+                    Abertos = [*Abertos, FilhosX[i]]    # Adds the current child to the LAST position of the Open array
+    return [[], iter]                                   # If it didn't succeeded, returns an empty array
 
 def DFS(inicial, obj, lim=0):
     """
@@ -276,28 +278,31 @@ def DFS(inicial, obj, lim=0):
     """
 
     depth = 0
-    X = Node(inicial, depth=depth)
-    Abertos = [X]
-    Fechados = []
-    iter = 0
-    while Abertos != []:
-        iter += 1
-        X = Abertos[0]
-        del Abertos[0]
-        if (X.graph == obj).all():
-            X.setPath()
-            return [X, iter]
-        elif X.depth < lim:
-            Aux = geraFilhos(X)
-            FilhosX = []
-            depth = X.depth + 1
-            for i in range(len(Aux)):
-                FilhosX = [*FilhosX, Node(Aux[i], X, depth)]
-            Fechados.append(X)
-            for i in range(len(FilhosX)-1,-1,-1):
+    X = Node(inicial, depth=depth)                              # Creates a node based on the initial matrix called X with depth 0
+    Abertos = [X]                                               # Creates an array (Open) with all the visited, but not finished, nodes with X in it
+    Fechados = []                                               # Creates an empty array (Closed) to store all finished nodes (nodes that already had all it's
+                                                                # children checked)
+    iter = 0                                                    # Initiates the iteration counter
+    while Abertos != []:                                        # Keeps checking the nodes until there's no unfinished node left
+        iter += 1                                               # Increments the iteration counter by 1
+        X = Abertos[0]                                          # X receives the first unfinished node
+        del Abertos[0]                                          # Removes the first node from the Open array
+        if (X.graph == obj).all():                              # If the main matrix of X is the objective...
+            X.setPath()                                         # Sets the node's path...
+            return [X, iter]                                    # ...and returns it
+        elif X.depth < lim:                                     # If it's not the objective and it's below depth limit...
+            Aux = geraFilhos(X)                                 # Generates it's children and stores it in an auxiliary array
+            FilhosX = []                                        # Initiates the Children array as empty
+            depth = X.depth + 1                                 # Makes the depth variable receive X's depth incremented by 1
+            for i in range(len(Aux)):                           # Loops the auxiliary array
+                FilhosX = [*FilhosX, Node(Aux[i], X, depth)]    # Generate new nodes with the auxiliary array's matrix as the main matrix, X as parent, and with
+                                                                # incremented depth
+            Fechados.append(X)                                  # Adds X to the end of the Closed array
+            for i in range(len(FilhosX)-1,-1,-1):               # Loops the Children array backwards
                 if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):
-                    Abertos = [FilhosX[i], *Abertos]
-    return [[], iter]
+                                                                # If the current child is in neither Open nor Closed...
+                    Abertos = [FilhosX[i], *Abertos]            # Adds the current child to the FIRST position of the Open array
+    return [[], iter]                                           # If it didn't succeeded, returns an empty array
 
 def BMS(inicial, obj):
     """
@@ -333,9 +338,9 @@ def BMS(inicial, obj):
                                                                         # it's children checked)
     iter = 0                                                            # Initiates the iteration counter
     while Abertos != []:                                                # Keeps checking the nodes until there's no unfinished node left
-        iter += 1                                                       # Increments the iteration counter
+        iter += 1                                                       # Increments the iteration counter by 1
         X = Abertos[0]                                                  # X receives the first unfinished node
-        del Abertos[0]                                                  # Removes the node from the Open array
+        del Abertos[0]                                                  # Removes the first node from the Open array
         if(X.graph == obj).all():                                       # If the main matrix of X is the objective...
             X.setPath()                                                 # Sets the node's path...
             return [X, iter]                                            # ...and returns it
