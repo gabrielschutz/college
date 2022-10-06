@@ -23,6 +23,8 @@ begin
 		variable Btemp			: unsigned (4 downto 0);
 		variable Temp4b		: unsigned (3 downto 0);
 		variable Temp5b		: unsigned (4 downto 0);
+		variable AritDez		: integer;
+		variable AritUni		: integer;
 		variable Op				: integer := 0;
 		
 		begin
@@ -45,12 +47,18 @@ begin
 			
 			if (Op = 0) then
 				Temp5b := Atemp + Btemp;
+				AritDez := to_integer(Temp5b) rem 10;
+				AritUni := to_integer(Temp5b) - AritDez;
 				
 			elsif (Op = 1) then
 				if (Atemp >= Btemp) then
 					Temp5b := Atemp - Btemp;
+					AritDez := to_integer(Temp5b) rem 10;
+					AritUni := to_integer(Temp5b) - AritDez;
 				else
 					Temp5b := Btemp - Atemp;
+					AritDez := to_integer(Temp5b) rem 10;
+					AritUni := to_integer(Temp5b) - AritDez;
 					Temp5b(4) := '1';
 				end if;
 				
@@ -108,170 +116,43 @@ begin
 				DSSd <= "1111111";
 				DSSc <= "1111111";
 				
-				if (Op = 0) then
+				if (Op = 0 or Op = 1) then
 				
-					case Temp5b is
+					case AritUni is
                     
-						  when "00000" => 
-                        DSSb <= "1000000"; --0
-                        DSSa <= "1000000"; --0
+						when 0 => DSSa <= "1000000"; --'0'
+						when 1 => DSSa <= "1111001"; --'1'
+						when 2 => DSSa <= "0100100"; --'2'
+						when 3 => DSSa <= "0110000"; --'3'
+						when 4 => DSSa <= "0011001"; --'4'
+						when 5 => DSSa <= "0010010"; --'5'
+						when 6 => DSSa <= "0000010"; --'6'
+						when 7 => DSSa <= "1111000"; --'7'
+						when 8 => DSSa <= "0000000"; --'8'
+						when 9 => DSSa <= "0010000"; --'9'
+						when others => DSSa <= "0000110"; --'E'
+
+					end case;
+
+					case AritDez is
                     
-						  when "00001" =>
-                        DSSb <= "1000000"; --0
-                        DSSa <= "1111001"; --1
-                    
-						  when "00010" =>
-                        DSSb <= "1000000"; --0
-                        DSSa <= "0100100"; --2
-                    when "00011" =>
-                        DSSb <= "1000000"; --0
-                        DSSa <= "0110000"; --3
-                    when "00100" =>
-                        DSSb <= "1000000"; --0    
-                        DSSa <= "0011001"; --4
-                    when "00101" =>
-                        DSSb <= "1000000"; --0
-                        DSSa <= "0010010"; --5									
-                    when "00110" =>
-                        DSSb <= "1000000"; --0    
-                        DSSa <= "0000010"; --6
-                    when "00111" =>
-                        DSSb <= "1000000"; --0                
-                        DSSa <= "1111000"; --7
-                    when "01000" =>
-                        DSSb <= "1000000"; --0    
-                        DSSa <= "0000000"; --8
-                    when "01001" =>
-                        DSSb <= "1000000"; --0    
-                        DSSa <= "0011000"; --9
-                    when "01010" => --10
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "1000000"; --0
-                    when "01011" => --11
-                        DSSb <= "1111001"; --1  
-                        DSSa <= "1111001"; --1
-                    when "01100" => --12
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "0100100"; --2
-                    when "01101" => --13
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "0110000"; --3
-                    when "01110" => --14
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "0011001"; --4
-                    when "01111" => --15
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "0010010"; --5
-                    when "10000" => --16
-                        DSSb <= "1111001"; --1
-                        DSSa <= "0000010"; --6
-                    when "10001" => --17
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "1111000"; --7
-                    when "10010" => --18
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "0000000"; --8
-                    when "10011" => --19
-                        DSSb <= "1111001"; --1    
-                        DSSa <= "0011000"; --9
-                    when "10100" => --20
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "1000000"; --0
-                    when "10101" => --21
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "1111001"; --1
-                    when "10110" => --22
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "0100100"; --2
-                    when "10111" => --23
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "0110000"; --3
-                    when "11000" => --24
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "0011001"; --4
-                    when "11001" => --25
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "0010010"; --5
-                    when "11010" => --26
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "0000010"; --6
-                    when "11011" => --27
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "1111000"; --7
-                    when "11100" => --28
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "0000000"; --8
-                    when "11101" => --29
-                        DSSb <= "0100100"; --2    
-                        DSSa <= "0011000"; --9
-                    when "11110" => --30
-                        DSSb <= "0110000"; --3    
-                        DSSa <= "1000000"; --0        
-                    when others =>
-                        DSSb <= "1111111";-- desligado
-                        DSSa <= "0000110";
-                end case;
-					 
-				elsif (Op = 1) then
+						when 0 => DSSb <= "1000000"; --'0'
+						when 1 => DSSb <= "1111001"; --'1'
+						when 2 => DSSb <= "0100100"; --'2'
+						when 3 => DSSb <= "0110000"; --'3'
+						when 4 => DSSb <= "0011001"; --'4'
+						when 5 => DSSb <= "0010010"; --'5'
+						when 6 => DSSb <= "0000010"; --'6'
+						when 7 => DSSb <= "1111000"; --'7'
+						when 8 => DSSb <= "0000000"; --'8'
+						when 9 => DSSb <= "0010000"; --'9'
+						when others => DSSa <= "1111111"; --'apagado'
+
+					end case;
 					
-					if (Temp5b(4) = '1') then
+					if (Op = 1 and Temp5b(4) = '1') then
 						DSSc <= "0111111";
 					end if;
-					
-					case Temp5b(3 downto 0) is
-                    
-						when "0000" => 
-							DSSb <= "1000000"; --0
-							DSSa <= "1000000"; --0
-					  
-						when "0001" =>
-							DSSb <= "1000000"; --0
-							DSSa <= "1111001"; --1
-					  
-						when "0010" =>
-							DSSb <= "1000000"; --0
-							DSSa <= "0100100"; --2
-						when "0011" =>
-							DSSb <= "1000000"; --0
-							DSSa <= "0110000"; --3
-						when "0100" =>
-							DSSb <= "1000000"; --0    
-							DSSa <= "0011001"; --4
-						when "0101" =>
-							DSSb <= "1000000"; --0
-							DSSa <= "0010010"; --5									
-						when "0110" =>
-							DSSb <= "1000000"; --0    
-							DSSa <= "0000010"; --6
-						when "0111" =>
-							DSSb <= "1000000"; --0                
-							DSSa <= "1111000"; --7
-						when "1000" =>
-							DSSb <= "1000000"; --0    
-							DSSa <= "0000000"; --8
-						when "1001" =>
-							DSSb <= "1000000"; --0    
-							DSSa <= "0011000"; --9
-						when "1010" => --10
-							DSSb <= "1111001"; --1    
-							DSSa <= "1000000"; --0
-						when "1011" => --11
-							DSSb <= "1111001"; --1  
-							DSSa <= "1111001"; --1
-						when "1100" => --12
-							DSSb <= "1111001"; --1    
-							DSSa <= "0100100"; --2
-						when "1101" => --13
-							DSSb <= "1111001"; --1    
-							DSSa <= "0110000"; --3
-						when "1110" => --14
-							DSSb <= "1111001"; --1    
-							DSSa <= "0011001"; --4
-						when "1111" => --15
-							DSSb <= "1111001"; --1    
-							DSSa <= "0010010"; --5
-				
-					end case;
 					
 				else
 				
