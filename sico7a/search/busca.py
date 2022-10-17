@@ -47,7 +47,7 @@ class Node:
         of the node
     """
 
-    def __init__(self, graph, pai=-1, depth=-1, heur=-1, path=[]) -> None:
+    def __init__(self, graph, pai=-1, depth=-1, heur=-1, aval=-1, path=[]) -> None:
         """
         Parameters
         ----------
@@ -77,6 +77,7 @@ class Node:
         self.pai = pai
         self.depth = depth
         self.heur = heur
+        self.aval = aval
         self.path = path
 
     def setPath(self):
@@ -107,13 +108,29 @@ class Node:
             objective matrix for the puzzle
         """
 
+        heur = 0
+
+        ### h1(n) ###
         lin = np.shape(self.graph)[0]                                           # Gets the number of rows...
         col = np.shape(self.graph)[1]                                           # And columns of the node's main graph
-        self.heur = lin*col                                                     # Multiply the rows and columns and starts the node's heuristic value with it
+        h1 = lin*col - 1                                                        # Multiply the rows and columns and starts the node's heuristic value with it
         for i in range(lin):                                                    # Loops the node's rows...
             for j in range(col):                                                # And columns
                 if(self.graph[i][j] != 'X') and (self.graph[i][j] == obj[i][j]):# If a not-'X' object is in the correct position...
-                    self.heur -= 1                                              # Decrements the node's heuristic value by 1
+                    h1 -= 1                                              # Decrements the node's heuristic value by 1
+
+        ### h2(n) ###
+        # NodeTemp = Node(obj)
+        # Xcur = self.findX()
+        # Xobj = NodeTemp.findX()
+        # h2 = abs(Xcur[0]-Xobj[0]) + abs(Xcur[1]-Xobj[1])
+
+        # heur = h1 + h2
+        heur = h1
+        self.heur = heur
+
+    def setAval(self):
+        self.aval = self.heur + self.depth
 
     def printPath(self):
         """
@@ -353,7 +370,80 @@ def BMS(inicial, obj):
                 if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):  # If the current children is not in neither in Open nor Closed 
                                                                                                     # arrays...
                     FilhosX[i].setHeur(obj)                             # Sets that child's heuristic...
-                    Abertos = insertionSort(Abertos, FilhosX[i])        # And inserts it in the Open array, ordering it crescently by heuristic value
+                    Abertos = insertionSort(Abertos, FilhosX[i], 0)     # And inserts it in the Open array, ordering it crescently by heuristic value
+                # elif FilhosX[i].checkExiste(Abertos):                   # If it's in the Open array...
+                #     pos = FilhosX[i].getIndex(Abertos)                  # Gets it's position in the array...
+                #     if (len(FilhosX[i].path) < len(Abertos[pos].path)): # If the current child's path is shorter than the node in the Open array...
+                #         Abertos[pos] = FilhosX[i]                       # Swap them
+                # elif FilhosX[i].checkExiste(Fechados):                  # If it's in the Closed array...
+                #     pos = FilhosX[i].getIndex(Fechados)                 # Gets it's position in the array...
+                #     if (len(FilhosX[i].path) < len(Fechados[pos].path)):# If it's path is shorter than the node currently inside the array...
+                #         del Fechados[pos]                               # Remove it from the Closed array...
+                #         Abertos = insertionSort(Abertos, FilhosX[i], 0) # And inserts it in the Open array, ordering it crescently by heuristic value
+        Fechados = [*Fechados, X]                                       # After all this, inserts X in the end of the Closed array
+    return [[], iter]                                                   # If it didn't succeeded, returns an empty array
+
+def AST(inicial, obj):
+    """
+    Best Match Search algorith, from the root node, generates it's children,
+    generates it's children heuristics, then checks the child with the best
+    heuristic value until the objective is found
+
+    Parameters
+    ----------
+
+    inicial : object matrix
+        initial positions of the puzzle matrix
+    
+    obj : object matrix
+        objective positions of the puzzle matrix
+
+    Returns
+    -------
+
+    [X, iter] : [Node, int]
+        two positions array where X is the node with the objective and iter is 
+        the number of iterations until it was found
+    
+    [[], iter] : [[], int]
+        two positions array with an empty array in the first position as a fail
+        indication, the second position indicates the number of iterations until
+        the fail
+    """
+
+    depth = 0
+    X = Node(inicial, depth=depth)                                      # Creates a node based on the initial matrix called X
+    X.setHeur(obj)
+    X.setAval()
+    Abertos = [X]                                                       # Creates an array (Open) with all the visited, but not finished, nodes with X in it
+    Fechados = []                                                       # Creates an empty array (Closed) to store all finished nodes (nodes that already had all
+                                                                        # it's children checked)
+    iter = 0                                                            # Initiates the iteration counter
+    while Abertos != []:                                                # Keeps checking the nodes until there's no unfinished node left
+        iter += 1                                                       # Increments the iteration counter by 1
+        X = Abertos[0]                                                  # X receives the first unfinished node
+        del Abertos[0]                                                  # Removes the first node from the Open array
+        if(X.graph == obj).all():                                       # If the main matrix of X is the objective...
+            X.setPath()                                                 # Sets the node's path...
+            print('\n------------------------------------\n')
+            for i in range(len(Abertos)):
+                print(Abertos[i].graph, Abertos[i].aval, '\n')
+            print('\n------------------------------------\n')
+            for i in range(len(Fechados)):
+                print(Fechados[i].graph, Fechados[i].aval, '\n')
+            return [X, iter]                                            # ...and returns it
+        else:                                                           # If it's not the objective...
+            Aux = geraFilhos(X)                                         # Generates it's children and stores it in an auxiliary array
+            FilhosX = []                                                # Initiates the Children array as empty
+            depth = X.depth + 1
+            for i in range(len(Aux)):                                   # Loops the auxiliary array
+                FilhosX = [*FilhosX, Node(Aux[i], X, depth=depth)]      # Generate new nodes with the auxiliary array's matrix as the main matrix, and X as parent
+            for i in range(len(FilhosX)):                               # Loops the Children array
+                if not(FilhosX[i].checkExiste(Abertos)) and not(FilhosX[i].checkExiste(Fechados)):  # If the current children is not in neither in Open nor Closed 
+                                                                                                    # arrays...
+                    FilhosX[i].setHeur(obj)                             # Sets that child's heuristic...
+                    FilhosX[i].setAval()
+                    Abertos = insertionSort(Abertos, FilhosX[i], 1)     # And inserts it in the Open array, ordering it crescently by heuristic value
                 elif FilhosX[i].checkExiste(Abertos):                   # If it's in the Open array...
                     pos = FilhosX[i].getIndex(Abertos)                  # Gets it's position in the array...
                     if (len(FilhosX[i].path) < len(Abertos[pos].path)): # If the current child's path is shorter than the node in the Open array...
@@ -362,7 +452,7 @@ def BMS(inicial, obj):
                     pos = FilhosX[i].getIndex(Fechados)                 # Gets it's position in the array...
                     if (len(FilhosX[i].path) < len(Fechados[pos].path)):# If it's path is shorter than the node currently inside the array...
                         del Fechados[pos]                               # Remove it from the Closed array...
-                        Abertos = insertionSort(Abertos, FilhosX[i])    # And inserts it in the Open array, ordering it crescently by heuristic value
+                        Abertos = insertionSort(Abertos, FilhosX[i], 1) # And inserts it in the Open array, ordering it crescently by heuristic value
         Fechados = [*Fechados, X]                                       # After all this, inserts X in the end of the Closed array
     return [[], iter]                                                   # If it didn't succeeded, returns an empty array
 
@@ -413,15 +503,22 @@ def geraFilhos(Node):
         k += 1
     return Aux[0:k]                                                 # Returns an array of the size of the number of children generated containing said children
 
-def insertionSort(A, ins):
+def insertionSort(A, ins, ind):
     """
-    Inserts a node in a node array ordering crescently by heuristic
+    Inserts a node in a node array ordering crescently by heuristic if index is
+    0, or by evaluation if index is 1
     """
 
     n = len(A)
-    for i in range(n):
-        if A[i].heur > ins.heur:
-            return [*A[0:i], ins, *A[i:n]]
+
+    if ind == 0:
+        for i in range(n):
+            if A[i].heur > ins.heur:
+                return [*A[0:i], ins, *A[i:n]]
+    else:
+        for i in range(n):
+            if A[i].aval > ins.aval:
+                return [*A[0:i], ins, *A[i:n]]
     return [*A, ins]
 
 ############################################################################## MAIN ###############################################################################
@@ -443,6 +540,10 @@ DFSres = DFS(Ini, Obj, 5)       # Same for DFS...
 print('\nDFS:', DFSres[1], 'iteracoes\n\n',DFSres[0].graph, '\n\nCAMINHO:\n')
 DFSres[0].printPath()
 
-BMSres = BMS(Ini, Obj)          # ... and for BMS
+BMSres = BMS(Ini, Obj)          # BMS...
 print('\nBusca Melhor Escolha:', BMSres[1], 'iteracoes\n\n',BMSres[0].graph, '\n\nCAMINHO:\n')
 BMSres[0].printPath()
+
+ASTres = AST(Ini, Obj)          # ... and for AST
+print('\nA*:', ASTres[1], 'iteracoes\n\n',ASTres[0].graph, '\n\nCAMINHO:\n')
+ASTres[0].printPath()
