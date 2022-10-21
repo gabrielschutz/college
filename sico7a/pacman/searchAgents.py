@@ -466,7 +466,9 @@ def foodHeuristic(state, problem):
         closestDotDist = sys.maxsize        # Initiates the distance of the closest food with the maximum possible value from Python
                                             # (Has to be the biggest value so that anything generated below is lower than this)
         for i in range(remFood):            # Loops the list of food positions
-            currentDist = util.manhattanDistance(position, foodList[i]) # Gets the distance between Pacman and the current food on the list
+            currentDist = util.manhattanDistance(position, foodList[i]) # Gets the Manhattan distance between Pacman and the current food on the list
+                                                # (Thecnically using the REAL distance here instead of the Manhattan distance would be better, but the function
+                                                # mazeDistance calculates the distance using a BFS, so using it for every food makes this VERY slow)
             if currentDist < closestDotDist:    # If the current distance is lower than the closest distance
                 closestDotDist = currentDist        # Makes the closest distance be the current distance
                 closestDotPos = foodList[i]         # And saves the position of the closest food
