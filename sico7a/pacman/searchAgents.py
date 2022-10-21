@@ -471,7 +471,8 @@ def foodHeuristic(state, problem):
                 closestDotDist = currentDist        # Makes the closest distance be the current distance
                 closestDotPos = foodList[i]         # And saves the position of the closest food
         return mazeDistance(position, closestDotPos, problem.startingGameState) + remFood
-                                            # The heuristic then will be: the distance between Pacman and the closest food + the number of remaining food
+                                            # The heuristic then will be: the REAL distance between Pacman and the closest food + the number of remaining food
+                                            # (The REAL distance means that it takes walls in consideration)
 
 ########################################################## /\/\/\/\/\ ONLY THIS WAS EDITED /\/\/\/\/\ ###########################################################
 
